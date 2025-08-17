@@ -4,7 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+
 print("Using device:", device)
 
 def julia(width, height, c, x_min=-2.0, x_max=1.0, y_min=-1.3, y_max=1.3, max_iter=200):
