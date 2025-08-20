@@ -19,10 +19,10 @@ steps = N // chains
 
 # Affine transformation parameters: [a,b,c,d,e,f]
 params = torch.tensor([
-    [0.0,    0.0,    0.0, 0.16, 0.0, 0.0],   # f1
-    [0.85,  0.04,  -0.04, 0.85, 0.0, 1.6],   # f2
-    [0.2,  -0.26,  0.23, 0.22, 0.0, 1.6],    # f3
-    [-0.15, 0.28,  0.26, 0.24, 0.0, 0.44]    # f4
+    [0.0,    0.0,    0.0, 0.16, 0.0, 0.0],   # 1% for stem
+    [0.85,  0.04,  -0.04, 0.85, 0.0, 1.6],   # 85% for main fern and small leaves
+    [0.2,  -0.26,  0.23, 0.22, 0.0, 1.6],    # 7% for the biggest left leaf
+    [-0.15, 0.28,  0.26, 0.24, 0.0, 0.44]    # 7% for the biggest right leaf
 ], device=device)
 
 probs = torch.tensor([0.01, 0.85, 0.07, 0.07], device=device)
@@ -35,7 +35,7 @@ points = torch.zeros((N, 2), device=device)
 
 idx = 0
 for _ in range(steps):
-    r = torch.rand(chains, device=device)
+    r = torch.rand(chains, device=device) # random numbers for each chain，if r <= 0.01 then do f1(1%)
     func_idx = torch.searchsorted(cum_probs, r)
     a, b, c, d, e, f = [params[func_idx, i] for i in range(6)]
     x_new = a*x + b*y + e
@@ -85,7 +85,7 @@ plt.axis('off')
 
 # Density-based coloring
 plt.subplot(2,2,3)
-plt.hexbin(points_cpu[:,0], points_cpu[:,1], gridsize=300, cmap='inferno', mincnt=1)
+plt.hexbin(points_cpu[:,0], points_cpu[:,1], gridsize=300, cmap='inferno', mincnt=10)
 plt.title("Density Visualization")
 plt.axis('off')
 
@@ -97,4 +97,36 @@ plt.axis('off')
 
 plt.suptitle(f"Barnsley Fern - Estimated Fractal Dimension: {fd:.4f}", fontsize=16)
 plt.tight_layout()
+plt.show()
+
+
+# ---------------- ZOOM IN TO VERIFY SELF-SIMILARITY ----------------
+# create a new pattern for comparison
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+
+# 1. draw the whole pattern in left side
+ax1.scatter(points_cpu[:,0], points_cpu[:,1], s=0.1, color='green')
+ax1.set_title("Full Barnsley Fern")
+ax1.axis('off')
+
+# 2. draw the zoomed-in section on the right
+ax2.scatter(points_cpu[:,0], points_cpu[:,1], s=0.5, color='green') 
+ax2.set_title("Zoomed-in Section")
+
+# 3. set the axis limits to zoom in on a specific leaf
+# these coordinates define a clear area for you
+zoom_xlim = (0.1, 1.9)
+zoom_ylim = (0.5, 1.6)
+ax2.set_xlim(zoom_xlim)
+ax2.set_ylim(zoom_ylim)
+ax2.set_aspect('equal', adjustable='box') # Maintain the aspect ratio to prevent image distortion
+ax2.axis('off')
+
+# 4. mark the zoomed area on the original image
+from matplotlib.patches import Rectangle
+rect = Rectangle((zoom_xlim[0], zoom_ylim[0]), zoom_xlim[1]-zoom_xlim[0], zoom_ylim[1]-zoom_ylim[0],
+                 linewidth=1, edgecolor='r', facecolor='none')
+ax1.add_patch(rect)
+
+fig.suptitle("Verifying Self-Similarity of the Barnsley Fern", fontsize=16)
 plt.show()
