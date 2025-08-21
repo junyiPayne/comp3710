@@ -49,9 +49,10 @@ def main():
     sine_t = torch.sin(3.0 * X_t + 3.0 * Y_t)
     product_t = Z_t * sine_t
     product_np = product_t.cpu().numpy()
+    sine_np = sine_t.cpu().numpy()
 
     # Plot 1x3 (with colorbars)
-    fig, axs = plt.subplots(1, 3, figsize=(18, 6))
+    fig, axs = plt.subplots(1, 4, figsize=(18, 6))
 
     im0 = axs[0].contourf(X_np, Y_np, Z_np, levels=50, cmap='viridis')
     axs[0].set_title('NumPy Gaussian')
@@ -67,6 +68,11 @@ def main():
     axs[2].set_title('PyTorch Gaussian × Sine')
     axs[2].set_aspect('equal')
     fig.colorbar(im2, ax=axs[2], fraction=0.046, pad=0.04)
+
+    im3 = axs[3].contourf(X_np, Y_np, sine_np, levels=50, cmap='twilight_shifted')
+    axs[3].set_title('PyTorch Sine Wave')
+    axs[3].set_aspect('equal')
+    fig.colorbar(im3, ax=axs[3], fraction=0.046, pad=0.04)
 
     for ax in axs:
         ax.set_xlabel('x')
