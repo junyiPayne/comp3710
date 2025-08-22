@@ -9,8 +9,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 X, Y = np.mgrid[-4.0:4.0:0.01, -4.0:4.0:0.01]
 
 # Load into PyTorch tensors
-x = torch.tensor(X, dtype=torch.float32, device=device)
-y = torch.tensor(Y, dtype=torch.float32, device=device)
+x = torch.tensor(X, dtype=torch.float64, device=device)
+y = torch.tensor(Y, dtype=torch.float64, device=device)
 
 # ----- Gaussian -----
 sigma = 1.0

@@ -5,7 +5,7 @@ import torch
 # NumPy 2D Gaussian
 def gaussian_2d_np(x, y, mu_x=0.0, mu_y=0.0, sigma_x=1.0, sigma_y=1.0, rho=0.0):
     coef = 1.0 / (2.0 * np.pi * sigma_x * sigma_y * np.sqrt(1 - rho**2))
-    x_std = (x - mu_x) / sigma_x
+    x_std = (x - mu_x) / sigma_x #sigma is standard deviation, control the bell-shape curve thin or fat, more sigma, more fat
     y_std = (y - mu_y) / sigma_y
     exponent = -1.0 / (2.0 * (1 - rho**2)) * (x_std**2 - 2.0 * rho * x_std * y_std + y_std**2)
     return coef * np.exp(exponent)
@@ -21,6 +21,7 @@ def gaussian_2d_torch(x, y, mu_x=0.0, mu_y=0.0, sigma_x=1.0, sigma_y=1.0, rho=0.
     rho_t = torch.tensor(rho, dtype=dtype, device=device)
     one = torch.tensor(1.0, dtype=dtype, device=device)
 
+    # to zoom the whole Guassian function so that its total prob is 1
     norm = 1.0 / (2.0 * torch.pi * sigma_x_t * sigma_y_t * torch.sqrt(one - rho_t**2))
     x_std = (x - mu_x_t) / sigma_x_t
     y_std = (y - mu_y_t) / sigma_y_t
